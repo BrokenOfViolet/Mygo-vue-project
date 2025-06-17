@@ -1,0 +1,7 @@
+{
+"vscode_custom_css.imports": [
+"file:///Users/mac/.vscode/custom.css"
+],
+"vscode_custom_css.policy": true
+}
+// It is very comfortable to use the custom css in vscode
