@@ -1,15 +1,16 @@
 <style scoped src="./css/auth.css"></style>
-
 <template>
-    <div class="auth-form">
-        <h1 class="auth-title">Login</h1>
-        <form @submit.prevent="login">
-            <input v-model="username" placeholder="username"/>
-            <input v-model="password" type="password" placeholder="password"/>
-            <button type="submit">Login</button>
-            <p>Don't have an account? <router-link to="/register">Register here</router-link></p>
-            <p class="tipMessage">{{ message }}</p>
-        </form>
+    <div class="auth-page">
+        <div class="auth-form">
+            <h1 class="auth-title">Login</h1>
+            <form @submit.prevent="login">
+                <input v-model="username" placeholder="username"/>
+                <input v-model="password" type="password" placeholder="password"/>
+                <button type="submit">Login</button>
+                <p>Don't have an account? <router-link to="/register">Register here</router-link></p>
+                <p class="tipMessage">{{ message }}</p>
+            </form>
+        </div>
     </div>
 </template>
 

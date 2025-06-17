@@ -1,3 +1,12 @@
+.auth-page {
+    background-image: url('../../assets/bg2.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+}
+
 .auth-form {
     display: flex;
     flex-direction: column;
