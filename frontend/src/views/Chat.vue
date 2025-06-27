@@ -25,89 +25,84 @@
     </div>
   </template>
   
+<script setup>
+import { ref, onMounted, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
+import axios from 'axios'
 
-<script>
-import axios from 'axios';
+const messages = ref([])
+const newMessage = ref('')
+const currentUser = ref(localStorage.getItem('username') || 'User1')
+const route = useRoute()
+const to = ref(route.query.to || 'User2')
+const avatars = ref({})
+const end = ref(null)
+let ws = null
 
-export default {
-    data() {
-        return {
-            messages: [],
-            newMessage: '',
-            currentUser: localStorage.getItem('username') || 'User1',
-            to: this.$route.query.to || 'User2',
-            avatars: {},
-            ws: null,
-        };
-    },
-    created() {
-        this.fetchMessages();
-    },
-    methods: {
-        async fetchMessages() {
-            const res = await axios.get('http://localhost:3000/api/message', {
-                params: {
-                    user1: this.currentUser,
-                    user2: this.to
-                }
-            });
-            this.messages = res.data;
-            const users = new Set(this.messages.map(m => m.from));
-            for (const u of users) {
-                if (!this.avatars[u]) {
-                    const r = await axios.get(`http://localhost:3000/api/user/${u}`)
-                    this.avatars[u] = r.data.avatar;
-                }
-            }
-            this.$nextTick(() => this.scrollToBottom());
-        },
-        async sendMessage() {
-            if (!this.newMessage.trim()) return;
-            const msg = {
-                from: this.currentUser,
-                to: this.to,
-                content: this.newMessage.trim()
-            }
-            await axios.post('http://localhost:3000/api/message', msg);
-
-            if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-                this.ws.send(JSON.stringify(msg));
-            }
-            this.messages.push({...msg, createdAt: Date.now()});
-            this.newMessage = '';
-            this.scrollToBottom();
-        },
-        getAvatar(user) {
-            return this.avatars[user] || 'https://i.pravatar.cc/150?u=';
-        },
-        scrollToBottom() {
-            this.$nextTick(() => {
-            const el = this.$refs.end;
-            if (el && typeof el.scrollIntoView === 'function') {
-                el.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                console.warn('scrollIntoView failed: ref is not a DOM element', el);
-            }
-        });
+async function fetchMessages() {
+  const res = await axios.get('http://localhost:3000/api/message', {
+    params: {
+      user1: currentUser.value,
+      user2: to.value
+    }
+  })
+  messages.value = res.data
+  const users = new Set(messages.value.map(m => m.from))
+  for (const u of users) {
+    if (!avatars.value[u]) {
+      const r = await axios.get(`http://localhost:3000/api/user/${u}`)
+      avatars.value[u] = r.data.avatar
+    }
+  }
+  await nextTick()
+  scrollToBottom()
 }
 
-    },
-    mounted() {
-        this.fetchMessages().catch(err => {
-            console.log('Message loaded failed', err)
-        });
-
-        this.ws = new WebSocket('ws://localhost:3000');
-        this.ws.onopen = () => {
-            this.ws.send(JSON.stringify({type: 'init', username: this.currentUser}));
-        };
-        this.ws.onmessage = (event) => {
-            const msg = JSON.parse(event.data);
-            this.messages.push(msg);
-            this.scrollToBottom();
-        }
-    },
+async function sendMessage() {
+  if (!newMessage.value.trim()) return
+  const msg = {
+    from: currentUser.value,
+    to: to.value,
+    content: newMessage.value.trim()
+  }
+  await axios.post('http://localhost:3000/api/message', msg)
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(msg))
+  }
+  messages.value.push({ ...msg, createdAt: Date.now() })
+  newMessage.value = ''
+  scrollToBottom()
 }
+
+function getAvatar(user) {
+  return avatars.value[user] || 'https://i.pravatar.cc/150?u='
+}
+
+function scrollToBottom() {
+  nextTick(() => {
+    const el = end.value
+    if (el && typeof el.scrollIntoView === 'function') {
+      el.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      console.warn('scrollIntoView failed: ref is not a DOM element', el)
+    }
+  })
+}
+
+onMounted(() => {
+  fetchMessages().catch(err => {
+    console.log('Message loaded failed', err)
+  })
+  ws = new WebSocket('ws://localhost:3000')
+  ws.onopen = () => {
+    ws.send(JSON.stringify({ type: 'init', username: currentUser.value }))
+  }
+  ws.onmessage = (event) => {
+    const msg = JSON.parse(event.data)
+    messages.value.push(msg)
+    scrollToBottom()
+  }
+})
 </script>
 
 <style scoped>

@@ -42,57 +42,59 @@
     </div>
   </template>
   
-  <script>
-  import axios from 'axios';
-  
-  export default {
-    props: ['posts'],
-    data() {
-      return {
-        commentContent: {},
-        currentUser: ''
-      };
-    },
-    created() {
-      this.currentUser = localStorage.getItem('username') || 'Anonymous';
-    },
-    methods: {
-      async likePost(id) {
-        await axios.post(`http://localhost:3000/api/post/${id}/like`);
-        this.$emit('refresh');
-      },
-      async addComment(id) {
-        const content = this.commentContent[id];
-        if (!content) return;
-        await axios.post(`http://localhost:3000/api/post/${id}/comment`, {
-          username: this.currentUser,
-          content
-        });
-        this.commentContent[id] = '';
-        this.$emit('refresh');
-      },
-      chatWith(user) {
-        this.$router.push({ path: '/chat', query: { to: user } });
-      },
-      async follow(user) {
-        try {
-          const res = await axios.post(`http://localhost:3000/api/user/follow`, {
-            from: this.currentUser,
-            to: user
-          });
-          alert(res.data.message || 'Followed!');
-        } catch (err) {
-          console.error(err);
-          alert('Follow failed');
-        }
-      },
-      formatTime(timeStr) {
-        const date = new Date(timeStr);
-        return date.toLocaleString();
-      }
-    }
-  };
-  </script>
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+
+const props = defineProps(['posts'])
+const emit = defineEmits(['refresh'])
+const commentContent = ref({})
+const currentUser = ref('')
+const router = useRouter()
+
+onMounted(() => {
+  currentUser.value = localStorage.getItem('username') || 'Anonymous'
+})
+
+async function likePost(id) {
+  await axios.post(`http://localhost:3000/api/post/${id}/like`)
+  emit('refresh')
+}
+
+async function addComment(id) {
+  const content = commentContent.value[id]
+  if (!content) return
+  await axios.post(`http://localhost:3000/api/post/${id}/comment`, {
+    username: currentUser.value,
+    content
+  })
+  commentContent.value[id] = ''
+  emit('refresh')
+}
+
+function chatWith(user) {
+  router.push({ path: '/chat', query: { to: user } })
+}
+
+async function follow(user) {
+  try {
+    const res = await axios.post(`http://localhost:3000/api/user/follow`, {
+      from: currentUser.value,
+      to: user
+    })
+    alert(res.data.message || 'Followed!')
+  } catch (err) {
+    console.error(err)
+    alert('Follow failed')
+  }
+}
+
+function formatTime(timeStr) {
+  const date = new Date(timeStr)
+  return date.toLocaleString()
+}
+</script>
   
   <style scoped>
   .post-card {

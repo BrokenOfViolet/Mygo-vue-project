@@ -15,37 +15,31 @@
     </div>
   </template>
   
-  <script>
-  import PostList from '@/components/PostList.vue';
-  import AddPost from '@/components/AddPost.vue';
-  import axios from 'axios';
-  
-  export default {
-    components: {
-      PostList,
-      AddPost
-    },
-    data() {
-      return {
-        posts: [],
-        username: ''
-      };
-    },
-    methods: {
-      async fetchPosts() {
-        const res = await axios.get('http://localhost:3000/api/post');
-        this.posts = res.data;
-      },
-      goToProfile() {
-        this.$router.push({ path: '/profile', query: { user: this.username } });
-      }
-    },
-    mounted() {
-      this.username = localStorage.getItem('username') || 'Guest';
-      this.fetchPosts();
-    }
-  };
-  </script>
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import PostList from '@/components/PostList.vue'
+import AddPost from '@/components/AddPost.vue'
+import axios from 'axios'
+
+const posts = ref([])
+const username = ref('')
+const router = useRouter()
+
+async function fetchPosts() {
+  const res = await axios.get('http://localhost:3000/api/post')
+  posts.value = res.data
+}
+
+function goToProfile() {
+  router.push({ path: '/profile', query: { user: username.value } })
+}
+
+onMounted(() => {
+  username.value = localStorage.getItem('username') || 'Guest'
+  fetchPosts()
+})
+</script>
   
   <style scoped>
   .forum-header {

@@ -7,32 +7,27 @@
     </div>
 </template>
   
-<script>
+<script setup>
+import { ref } from 'vue'
 import axios from 'axios'
 
-export default {
-  data() {
-    return {
-      title: '',
-      content: '',
-    }
-  },
-  methods: {
-    async submitPost() {
-      if (!this.title || !this.content) {
-        alert('Title and Content are required')
-        return
-      }
-      await axios.post('http://localhost:3000/api/post', {
-        title: this.title,
-        content: this.content,
-        author: localStorage.getItem('userId')
-      })
-      this.title = ''
-      this.content = ''
-      this.$emit('refresh') // 通知父组件刷新帖子列表
-    }
+const title = ref('')
+const content = ref('')
+const emit = defineEmits(['refresh'])
+
+async function submitPost() {
+  if (!title.value || !content.value) {
+    alert('Title and Content are required')
+    return
   }
+  await axios.post('http://localhost:3000/api/post', {
+    title: title.value,
+    content: content.value,
+    author: localStorage.getItem('userId')
+  })
+  title.value = ''
+  content.value = ''
+  emit('refresh')
 }
 </script>
   

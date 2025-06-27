@@ -14,33 +14,29 @@
     </div>
 </template>
 
-<script>  
-import axios from 'axios';
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
 
-export default {
-    data() {
-        return {
-            username: '',
-            password: '',
-            message: ''
-        }
-    },
-    methods: {
-        async login() {
-            try {
-                const res = await axios.post('http://127.0.0.1:3000/api/user/login', {
-                    username: this.username,
-                    password: this.password,
-                })
-                const user = res.data.user;
-                this.message = res.data.message || 'Login success';
-                localStorage.setItem('username', user.username);
-                localStorage.setItem('userId', user._id);
-                this.$router.push('/Forum')  // 跳转到应用的根路径（首页）
-            } catch (err) {
-                this.message = err.response.data.message || 'Invalid username or password';
-            }
-        }
+const username = ref('')
+const password = ref('')
+const message = ref('')
+const router = useRouter()
+
+async function login() {
+    try {
+        const res = await axios.post('http://127.0.0.1:3000/api/user/login', {
+            username: username.value,
+            password: password.value,
+        })
+        const user = res.data.user
+        message.value = res.data.message || 'Login success'
+        localStorage.setItem('username', user.username)
+        localStorage.setItem('userId', user._id)
+        router.push('/Forum')
+    } catch (err) {
+        message.value = err.response.data.message || 'Invalid username or password'
     }
 }
 </script>

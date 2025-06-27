@@ -16,32 +16,28 @@
     </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
-export default {
-    data() {
-        return {
-            username: '',
-            password: '',
-            email:'',
-            message: ''
-        }
-    },
-    methods: {
-        async register() {
-            try {
-                const res = await axios.post('http://127.0.0.1:3000/api/user/register', {
-                    username: this.username,
-                    password: this.password,
-                    email: this.email,
-                })
-                console.log(res.data)
-                this.$router.push('/login')
-            } catch (err) { // 遇到非 2xx 响应会抛出异常
-                this.message = err.response.data.message || 'Register Failed';
-            }
-        }
+const username = ref('')
+const password = ref('')
+const email = ref('')
+const message = ref('')
+const router = useRouter()
+
+async function register() {
+    try {
+        const res = await axios.post('http://127.0.0.1:3000/api/user/register', {
+            username: username.value,
+            password: password.value,
+            email: email.value,
+        })
+        console.log(res.data)
+        router.push('/login')
+    } catch (err) {
+        message.value = err.response.data.message || 'Register Failed'
     }
 }
 </script>
