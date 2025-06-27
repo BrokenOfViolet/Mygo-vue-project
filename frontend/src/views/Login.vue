@@ -8,7 +8,6 @@
                 <input v-model="password" type="password" placeholder="password"/>
                 <button type="submit">Login</button>
                 <p>Don't have an account? <router-link to="/register">Register here</router-link></p>
-                <p class="tipMessage">{{ message }}</p>
             </form>
         </div>
     </div>
@@ -18,10 +17,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { ElNotification } from 'element-plus'
 
 const username = ref('')
 const password = ref('')
-const message = ref('')
 const router = useRouter()
 
 async function login() {
@@ -31,12 +30,22 @@ async function login() {
             password: password.value,
         })
         const user = res.data.user
-        message.value = res.data.message || 'Login success'
+        ElNotification.success({    // pop-up window using element-plus
+            title: 'Success',
+            message: res.data.message || 'Login success',
+            type: 'success',
+            position: 'top-right'
+        })
         localStorage.setItem('username', user.username)
         localStorage.setItem('userId', user._id)
         router.push('/Forum')
     } catch (err) {
-        message.value = err.response.data.message || 'Invalid username or password'
+        ElNotification.error({
+            title: 'Warning',
+            message: err.response.data.message || 'Invalid username or password',
+            type: 'warning',
+            position: 'top-right'
+        })
     }
 }
 </script>

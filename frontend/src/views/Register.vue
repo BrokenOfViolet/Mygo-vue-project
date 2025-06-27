@@ -10,7 +10,6 @@
                 <input v-model="password" type="password" placeholder="Password"/>
                 <button type="submit">Register</button>
                 <p>Already have an account? <router-link to="/login">Login here</router-link></p>
-                <p class="tipMessage">{{ message }}</p>
             </form>
         </div>
     </div>
@@ -20,11 +19,11 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { ElNotification } from 'element-plus'
 
 const username = ref('')
 const password = ref('')
 const email = ref('')
-const message = ref('')
 const router = useRouter()
 
 async function register() {
@@ -34,10 +33,20 @@ async function register() {
             password: password.value,
             email: email.value,
         })
-        console.log(res.data)
+        ElNotification.success({
+            title: 'Success',
+            message: res.data.message || 'Register Success',
+            type: 'success',
+            position: 'top-right'
+        })
         router.push('/login')
     } catch (err) {
-        message.value = err.response.data.message || 'Register Failed'
+        ElNotification.error({
+            title: 'Warning',
+            message: err.response.data.message || 'Register Failed',
+            type: 'warning',
+            position: 'top-right'
+        })
     }
 }
 </script>

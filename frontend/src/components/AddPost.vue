@@ -18,15 +18,20 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
-
+import { ElNotification } from 'element-plus'
+  
 const title = ref('')
 const content = ref('')
 const emit = defineEmits(['refresh'])
 
 async function submitPost() {
   if (!title.value || !content.value) {
-    // 可以用ElMessage或ElNotification美化提示
-    alert('Title and Content are required')
+    ElNotification.error({
+      title: 'Warning',
+      message: 'Please fill in all fields',
+      type: 'warning',
+      position: 'top-right'
+    })
     return
   }
   await axios.post('http://localhost:3000/api/post', {
