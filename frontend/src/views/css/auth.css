@@ -1,7 +1,13 @@
+@keyframes colorChange {
+    0% { color: red; }
+    50% { color: blue; }
+    100% { color: red; }
+  }
+
 .auth-page {
     background-image: url('../../assets/bg2.jpg');
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: center; 
     background-size: cover;
     height: 100vh;
     display: flex;
@@ -22,6 +28,7 @@
 }
 
 .auth-title {
+    animation: colorChange 3s infinite;
     margin-bottom: 20px;
 }
 
