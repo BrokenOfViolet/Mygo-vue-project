@@ -1,12 +1,20 @@
 <template>
-    <div class="add-post">
-      <h2>Create a New Post</h2>
-      <input v-model="title" placeholder="Post Title" />
-      <textarea v-model="content" placeholder="Post Content" maxlength="150"></textarea>
-      <button @click="submitPost">Submit</button>
-    </div>
+  <el-card class="add-post-card" shadow="hover">
+    <h2 class="add-post-title">Create a New Post</h2>
+    <el-input v-model="title" placeholder="Post Title" class="add-post-input" clearable />
+    <el-input
+      v-model="content"
+      type="textarea"
+      :rows="3"
+      maxlength="150"
+      show-word-limit
+      placeholder="Post Content"
+      class="add-post-input"
+    />
+    <el-button type="primary" @click="submitPost" style="margin-top:12px;">Submit</el-button>
+  </el-card>
 </template>
-  
+
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
@@ -17,6 +25,7 @@ const emit = defineEmits(['refresh'])
 
 async function submitPost() {
   if (!title.value || !content.value) {
+    // 可以用ElMessage或ElNotification美化提示
     alert('Title and Content are required')
     return
   }
@@ -30,23 +39,22 @@ async function submitPost() {
   emit('refresh')
 }
 </script>
-  
+
 <style scoped>
-.add-post {
-  margin: auto;
-  margin-bottom: 20px;
-  width: 90%;
-  box-sizing: border-box;
+.add-post-card {
+  max-width: 700px;
+  margin: 24px auto 16px auto;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.98);
 }
-
-input, textarea{
-  display: block;
+.add-post-title {
+  margin-bottom: 12px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #6366f1;
+}
+.add-post-input {
   margin-bottom: 10px;
-  width: 75%;
-}
-
-textarea {
-  resize: none;
 }
 </style>
   

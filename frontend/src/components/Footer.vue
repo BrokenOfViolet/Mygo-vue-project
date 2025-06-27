@@ -1,14 +1,11 @@
 <template>
-    <div class="Header">
-        Mygo Forum
+    <div class="Footer">
+        This is the footer
     </div>
 </template>
 
-<script setup>
-</script>
-
 <style scoped>
-.Header {
+.Footer {
     background-color: #333;
     color: #fff;
     padding: 10px;
